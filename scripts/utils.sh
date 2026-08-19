@@ -120,8 +120,18 @@ pop() {
         FLOAX_SESSION_NAME="$DEFAULT_SESSION_NAME"
     fi
 
-    tmux set-option -t "$FLOAX_SESSION_NAME" detach-on-destroy on
-    tmux popup \
+    tmux set-option -t "=$FLOAX_SESSION_NAME" detach-on-destroy on
+
+    # After `detach-client` there is no "current client" for tmux to hang the
+    # popup on, so a re-pop (resize / title change) either lands on the wrong
+    # client or fails outright. Callers that detach first set
+    # FLOAX_TARGET_CLIENT to the outer client's tty so we can name it here.
+    local popup_args=()
+    if [ -n "$FLOAX_TARGET_CLIENT" ]; then
+        popup_args+=(-c "$FLOAX_TARGET_CLIENT")
+    fi
+
+    tmux popup "${popup_args[@]}" \
         -S fg="$FLOAX_BORDER_COLOR" \
         -s fg="$FLOAX_TEXT_COLOR" \
         -T "$FLOAX_TITLE" \
