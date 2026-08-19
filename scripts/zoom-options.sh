@@ -10,27 +10,27 @@ resize() {
         return
     fi
     ORIGIN_SESSION="$(envvar_value ORIGIN_SESSION)"
-    if [ $((current_height+step)) -gt "$(tmux display -p -t "$ORIGIN_SESSION" '#{window_height}')" ] || 
-        [ $((current_width+step)) -gt "$(tmux display -p -t "$ORIGIN_SESSION" '#{window_width}')" ]; then
+    if [ $((current_height+step)) -gt "$(tmux display -p -t "=$ORIGIN_SESSION:" '#{window_height}')" ] ||
+        [ $((current_width+step)) -gt "$(tmux display -p -t "=$ORIGIN_SESSION:" '#{window_width}')" ]; then
         return
     fi
     tmux setenv -g FLOAX_WIDTH $((current_width+step))
     tmux setenv -g FLOAX_HEIGHT $((current_height+step))
-    tmux detach-client
+    tmux detach-client -s "=$FLOAX_SESSION_NAME"
     tmux_popup
 }
 
 full_screen() {
     tmux setenv -g FLOAX_WIDTH 100%
     tmux setenv -g FLOAX_HEIGHT 100%
-    tmux detach-client
+    tmux detach-client -s "=$FLOAX_SESSION_NAME"
     tmux_popup
 }
 
 reset_size() {
     tmux setenv -g FLOAX_WIDTH "$(tmux_option_or_fallback '@floax-width' '80%')" 
     tmux setenv -g FLOAX_HEIGHT "$(tmux_option_or_fallback '@floax-height' '80%')" 
-    tmux detach-client
+    tmux detach-client -s "=$FLOAX_SESSION_NAME"
     tmux_popup
 }
 
@@ -47,7 +47,7 @@ lock_bindings() {
 
 change_popup_title() {
     tmux setenv -g FLOAX_TITLE "$1"
-    tmux detach-client
+    tmux detach-client -s "=$FLOAX_SESSION_NAME"
     tmux_popup
 }
 

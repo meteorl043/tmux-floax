@@ -16,7 +16,10 @@ if [ "$(tmux display-message -p '#{session_name}')" = "$FLOAX_SESSION_NAME" ]; t
     fi
 
     tmux setenv -g FLOAX_TITLE "$FLOAX_TITLE"
-    tmux detach-client
+    # target the floating session explicitly: a bare `detach-client` lets tmux pick
+    # "the current client", which is sometimes the OUTER client -- that detaches the
+    # whole terminal instead of just closing the popup.
+    tmux detach-client -s "=$FLOAX_SESSION_NAME"
 else
     set_bindings
 
